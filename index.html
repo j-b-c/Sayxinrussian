@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russian to English Translator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Russian to English Translator</h1>
+            <p class="subtitle">Translate Russian text with phonetic and transliteration support</p>
+        </header>
+
+        <main>
+            <div class="translator-section">
+                <div class="input-section">
+                    <h2>Russian Text</h2>
+                    <textarea
+                        id="russianInput"
+                        placeholder="Enter Russian text here... (e.g., Привет)"
+                        rows="8"
+                    ></textarea>
+                    <button id="translateBtn" class="btn btn-primary">Translate</button>
+                </div>
+
+                <div class="output-section">
+                    <h2>Translation Results</h2>
+
+                    <div class="result-group">
+                        <h3>Cyrillic (Original)</h3>
+                        <div id="cyrillicOutput" class="output-box"></div>
+                    </div>
+
+                    <div class="result-group">
+                        <h3>Transliteration (Western)</h3>
+                        <div id="transliterationOutput" class="output-box"></div>
+                    </div>
+
+                    <div class="result-group">
+                        <h3>Phonetic Spelling</h3>
+                        <div id="phoneticOutput" class="output-box"></div>
+                    </div>
+
+                    <div class="result-group">
+                        <h3>English Translation</h3>
+                        <div id="englishOutput" class="output-box"></div>
+                    </div>
+
+                    <div class="audio-controls">
+                        <h3>Listen</h3>
+                        <div class="voice-selection">
+                            <label>
+                                <input type="radio" name="voice" value="male" checked>
+                                Male Voice
+                            </label>
+                            <label>
+                                <input type="radio" name="voice" value="female">
+                                Female Voice
+                            </label>
+                        </div>
+                        <button id="listenBtn" class="btn btn-secondary" disabled>
+                            🔊 Listen to Russian Text
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="examples">
+                <h3>Try these examples:</h3>
+                <div class="example-buttons">
+                    <button class="example-btn" data-text="Привет">Hello (Привет)</button>
+                    <button class="example-btn" data-text="Спасибо">Thank you (Спасибо)</button>
+                    <button class="example-btn" data-text="Как дела?">How are you? (Как дела?)</button>
+                    <button class="example-btn" data-text="Добрый день">Good day (Добрый день)</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Using Web Speech API for text-to-speech and MyMemory Translation API</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
