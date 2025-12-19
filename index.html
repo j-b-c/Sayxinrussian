@@ -3,84 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Russian to English Translator</title>
+    <title>English to Russian Translator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <h3>History</h3>
+            <ul id="historyList" class="sidebar-list"></ul>
+            <button id="showMoreHistory" class="show-more-btn" style="display: none;">
+                Show more
+            </button>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>Russian Expressions</h3>
+            <ul id="expressionsList" class="sidebar-list">
+                <li data-text="Go to hell">Go to hell</li>
+                <li data-text="What the fuck">What the fuck</li>
+                <li data-text="Son of a bitch">Son of a bitch</li>
+                <li data-text="Damn it">Damn it</li>
+                <li data-text="Fuck off">Fuck off</li>
+                <li data-text="Bullshit">Bullshit</li>
+                <li data-text="Holy shit">Holy shit</li>
+                <li data-text="Screw you">Screw you</li>
+                <li data-text="Kiss my ass">Kiss my ass</li>
+                <li data-text="You bastard">You bastard</li>
+                <li data-text="Shut the fuck up">Shut the fuck up</li>
+                <li data-text="What the hell">What the hell</li>
+                <li data-text="Get lost">Get lost</li>
+                <li data-text="You idiot">You idiot</li>
+                <li data-text="Piece of shit">Piece of shit</li>
+                <li data-text="To hell with it">To hell with it</li>
+                <li data-text="Don't give a damn">Don't give a damn</li>
+                <li data-text="Are you out of your mind">Are you out of your mind</li>
+                <li data-text="What a mess">What a mess</li>
+                <li data-text="I don't give a shit">I don't give a shit</li>
+            </ul>
+        </div>
+    </aside>
+
     <div class="container">
         <header>
-            <h1>Russian to English Translator</h1>
-            <p class="subtitle">Translate Russian text with phonetic and transliteration support</p>
+            <h1>English to Russian</h1>
+            <p class="subtitle">Translate English text to Russian with pronunciation guide</p>
         </header>
 
         <main>
             <div class="translator-section">
                 <div class="input-section">
-                    <h2>Russian Text</h2>
                     <textarea
-                        id="russianInput"
-                        placeholder="Enter Russian text here... (e.g., Привет)"
-                        rows="8"
+                        id="englishInput"
+                        placeholder="Enter English text here..."
+                        rows="4"
                     ></textarea>
                     <button id="translateBtn" class="btn btn-primary">Translate</button>
                 </div>
 
                 <div class="output-section">
-                    <h2>Translation Results</h2>
-
                     <div class="result-group">
-                        <h3>Cyrillic (Original)</h3>
+                        <h3>Cyrillic</h3>
                         <div id="cyrillicOutput" class="output-box"></div>
                     </div>
 
                     <div class="result-group">
-                        <h3>Transliteration (Western)</h3>
+                        <h3>Western Characters</h3>
                         <div id="transliterationOutput" class="output-box"></div>
                     </div>
 
                     <div class="result-group">
-                        <h3>Phonetic Spelling</h3>
+                        <h3>Phonetic</h3>
                         <div id="phoneticOutput" class="output-box"></div>
                     </div>
 
-                    <div class="result-group">
-                        <h3>English Translation</h3>
-                        <div id="englishOutput" class="output-box"></div>
-                    </div>
-
                     <div class="audio-controls">
-                        <h3>Listen</h3>
-                        <div class="voice-selection">
-                            <label>
-                                <input type="radio" name="voice" value="male" checked>
-                                Male Voice
-                            </label>
-                            <label>
-                                <input type="radio" name="voice" value="female">
-                                Female Voice
-                            </label>
-                        </div>
-                        <button id="listenBtn" class="btn btn-secondary" disabled>
-                            🔊 Listen to Russian Text
+                        <button id="listenBtn" class="btn btn-listen" disabled>
+                            Listen
                         </button>
                     </div>
                 </div>
             </div>
 
             <div class="examples">
-                <h3>Try these examples:</h3>
                 <div class="example-buttons">
-                    <button class="example-btn" data-text="Привет">Hello (Привет)</button>
-                    <button class="example-btn" data-text="Спасибо">Thank you (Спасибо)</button>
-                    <button class="example-btn" data-text="Как дела?">How are you? (Как дела?)</button>
-                    <button class="example-btn" data-text="Добрый день">Good day (Добрый день)</button>
+                    <button class="example-btn" data-text="Hello">Hello</button>
+                    <button class="example-btn" data-text="Thank you">Thank you</button>
+                    <button class="example-btn" data-text="How are you?">How are you?</button>
+                    <button class="example-btn" data-text="Good morning">Good morning</button>
+                    <button class="example-btn" data-text="Goodbye">Goodbye</button>
                 </div>
             </div>
         </main>
-
-        <footer>
-            <p>Using Web Speech API for text-to-speech and MyMemory Translation API</p>
-        </footer>
     </div>
 
     <script src="script.js"></script>

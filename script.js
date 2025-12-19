@@ -18,40 +18,47 @@ const transliterationMap = {
 
 // Cyrillic to phonetic map (approximate English pronunciation)
 const phoneticMap = {
-    'а': 'ah', 'б': 'beh', 'в': 'veh', 'г': 'geh', 'д': 'deh',
-    'е': 'yeh', 'ё': 'yoh', 'ж': 'zheh', 'з': 'zeh', 'и': 'ee',
-    'й': 'y', 'к': 'kah', 'л': 'el', 'м': 'em', 'н': 'en',
-    'о': 'oh', 'п': 'peh', 'р': 'air', 'с': 'es', 'т': 'teh',
-    'у': 'oo', 'ф': 'ef', 'х': 'khah', 'ц': 'tseh', 'ч': 'cheh',
-    'ш': 'shah', 'щ': 'shchah', 'ъ': '', 'ы': 'ih', 'ь': '',
+    'а': 'ah', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd',
+    'е': 'yeh', 'ё': 'yoh', 'ж': 'zh', 'з': 'z', 'и': 'ee',
+    'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n',
+    'о': 'oh', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't',
+    'у': 'oo', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch',
+    'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'ih', 'ь': '',
     'э': 'eh', 'ю': 'yoo', 'я': 'yah',
-    'А': 'AH', 'Б': 'BEH', 'В': 'VEH', 'Г': 'GEH', 'Д': 'DEH',
-    'Е': 'YEH', 'Ё': 'YOH', 'Ж': 'ZHEH', 'З': 'ZEH', 'И': 'EE',
-    'Й': 'Y', 'К': 'KAH', 'Л': 'EL', 'М': 'EM', 'Н': 'EN',
-    'О': 'OH', 'П': 'PEH', 'Р': 'AIR', 'С': 'ES', 'Т': 'TEH',
-    'У': 'OO', 'Ф': 'EF', 'Х': 'KHAH', 'Ц': 'TSEH', 'Ч': 'CHEH',
-    'Ш': 'SHAH', 'Щ': 'SHCHAH', 'Ъ': '', 'Ы': 'IH', 'Ь': '',
+    'А': 'AH', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D',
+    'Е': 'YEH', 'Ё': 'YOH', 'Ж': 'ZH', 'З': 'Z', 'И': 'EE',
+    'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N',
+    'О': 'OH', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T',
+    'У': 'OO', 'Ф': 'F', 'Х': 'KH', 'Ц': 'TS', 'Ч': 'CH',
+    'Ш': 'SH', 'Щ': 'SHCH', 'Ъ': '', 'Ы': 'IH', 'Ь': '',
     'Э': 'EH', 'Ю': 'YOO', 'Я': 'YAH'
 };
 
 // DOM elements
-const russianInput = document.getElementById('russianInput');
+const englishInput = document.getElementById('englishInput');
 const translateBtn = document.getElementById('translateBtn');
 const listenBtn = document.getElementById('listenBtn');
 const cyrillicOutput = document.getElementById('cyrillicOutput');
 const transliterationOutput = document.getElementById('transliterationOutput');
 const phoneticOutput = document.getElementById('phoneticOutput');
-const englishOutput = document.getElementById('englishOutput');
 const exampleButtons = document.querySelectorAll('.example-btn');
+const historyList = document.getElementById('historyList');
+const showMoreBtn = document.getElementById('showMoreHistory');
+const expressionsList = document.getElementById('expressionsList');
 
 // Speech synthesis variables
-let currentVoice = 'male';
-let russianVoices = [];
+let currentRussianText = '';
+let milenaVoice = null;
+
+// History settings
+const MAX_HISTORY = 50;
+const DEFAULT_VISIBLE = 8;
+let showAllHistory = false;
+let translationHistory = [];
 
 // Initialize speech synthesis
 function initializeSpeech() {
     if ('speechSynthesis' in window) {
-        // Load voices
         loadVoices();
         if (speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = loadVoices;
@@ -61,43 +68,7 @@ function initializeSpeech() {
 
 function loadVoices() {
     const voices = speechSynthesis.getVoices();
-    russianVoices = voices.filter(voice => voice.lang.startsWith('ru'));
-
-    // If no Russian voices available, use any available voices
-    if (russianVoices.length === 0) {
-        russianVoices = voices;
-    }
-}
-
-// Get selected voice based on gender preference
-function getVoice() {
-    if (russianVoices.length === 0) {
-        return null;
-    }
-
-    const selectedGender = document.querySelector('input[name="voice"]:checked').value;
-
-    // Try to find a voice matching the gender preference
-    let voice = russianVoices.find(v => {
-        const nameLower = v.name.toLowerCase();
-        if (selectedGender === 'female') {
-            return nameLower.includes('female') || nameLower.includes('woman') ||
-                   nameLower.includes('anna') || nameLower.includes('elena') ||
-                   nameLower.includes('irina') || nameLower.includes('tatiana');
-        } else {
-            return nameLower.includes('male') || nameLower.includes('man') ||
-                   nameLower.includes('yuri') || nameLower.includes('dmitry') ||
-                   nameLower.includes('maxim') || nameLower.includes('pavel');
-        }
-    });
-
-    // If no gender-specific voice found, use the first available Russian voice
-    if (!voice) {
-        voice = russianVoices.find(v => v.lang.startsWith('ru'));
-    }
-
-    // If still no voice, use the first available voice
-    return voice || russianVoices[0];
+    milenaVoice = voices.find(v => v.name.toLowerCase().includes('milena'));
 }
 
 // Transliterate Cyrillic to Latin
@@ -110,11 +81,11 @@ function toPhonetic(text) {
     return text.split('').map(char => phoneticMap[char] || char).join('');
 }
 
-// Translate Russian to English using MyMemory API
+// Translate English to Russian using MyMemory API
 async function translateText(text) {
     try {
         const encodedText = encodeURIComponent(text);
-        const url = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=ru|en`;
+        const url = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=en|ru`;
 
         const response = await fetch(url);
         const data = await response.json();
@@ -126,96 +97,164 @@ async function translateText(text) {
         }
     } catch (error) {
         console.error('Translation error:', error);
-        return 'Translation error. Please try again.';
+        return null;
     }
 }
 
-// Speak Russian text
+// Speak Russian text using Milena voice
 function speakText(text) {
-    if ('speechSynthesis' in window) {
-        // Cancel any ongoing speech
+    if ('speechSynthesis' in window && text) {
         speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
+
+        if (milenaVoice) {
+            utterance.voice = milenaVoice;
+        }
         utterance.lang = 'ru-RU';
-        utterance.rate = 0.9; // Slightly slower for clarity
+        utterance.rate = 0.9;
         utterance.pitch = 1;
 
-        const voice = getVoice();
-        if (voice) {
-            utterance.voice = voice;
-        }
-
         utterance.onstart = () => {
-            listenBtn.textContent = '🔊 Speaking...';
+            listenBtn.textContent = 'Speaking...';
             listenBtn.disabled = true;
         };
 
         utterance.onend = () => {
-            listenBtn.textContent = '🔊 Listen to Russian Text';
+            listenBtn.textContent = 'Listen';
             listenBtn.disabled = false;
         };
 
         utterance.onerror = () => {
-            listenBtn.textContent = '🔊 Listen to Russian Text';
+            listenBtn.textContent = 'Listen';
             listenBtn.disabled = false;
         };
 
         speechSynthesis.speak(utterance);
+    }
+}
+
+// History management
+function loadHistory() {
+    try {
+        const saved = localStorage.getItem('translationHistory');
+        if (saved) {
+            translationHistory = JSON.parse(saved);
+        }
+    } catch (e) {
+        translationHistory = [];
+    }
+    renderHistory();
+}
+
+function saveHistory() {
+    try {
+        localStorage.setItem('translationHistory', JSON.stringify(translationHistory));
+    } catch (e) {
+        // Storage full or unavailable
+    }
+}
+
+function addToHistory(text) {
+    // Remove if already exists (to move to top)
+    translationHistory = translationHistory.filter(item => item !== text);
+
+    // Add to beginning
+    translationHistory.unshift(text);
+
+    // Limit to max
+    if (translationHistory.length > MAX_HISTORY) {
+        translationHistory = translationHistory.slice(0, MAX_HISTORY);
+    }
+
+    saveHistory();
+    renderHistory();
+}
+
+function renderHistory() {
+    historyList.innerHTML = '';
+
+    const itemsToShow = showAllHistory ? translationHistory : translationHistory.slice(0, DEFAULT_VISIBLE);
+
+    itemsToShow.forEach(text => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        li.setAttribute('data-text', text);
+        historyList.appendChild(li);
+    });
+
+    // Show/hide "Show more" button
+    if (translationHistory.length > DEFAULT_VISIBLE) {
+        showMoreBtn.style.display = 'block';
+        showMoreBtn.textContent = showAllHistory ? 'Show less' : `Show more (${translationHistory.length - DEFAULT_VISIBLE})`;
     } else {
-        alert('Text-to-speech is not supported in your browser.');
+        showMoreBtn.style.display = 'none';
     }
 }
 
 // Handle translation
 async function handleTranslation() {
-    const text = russianInput.value.trim();
+    const text = englishInput.value.trim();
 
     if (!text) {
-        alert('Please enter some Russian text to translate.');
         return;
     }
 
-    // Disable button and show loading state
     translateBtn.disabled = true;
-    translateBtn.innerHTML = '<span class="loading"></span> Translating...';
+    translateBtn.innerHTML = '<span class="loading"></span>';
+    listenBtn.disabled = true;
 
-    // Display Cyrillic (original)
-    cyrillicOutput.textContent = text;
+    // Clear previous results
+    cyrillicOutput.textContent = '';
+    transliterationOutput.textContent = '';
+    phoneticOutput.textContent = '';
 
-    // Generate and display transliteration
-    const transliterated = transliterate(text);
-    transliterationOutput.textContent = transliterated;
+    // Translate to Russian
+    const russianText = await translateText(text);
 
-    // Generate and display phonetic
-    const phonetic = toPhonetic(text);
-    phoneticOutput.textContent = phonetic;
+    if (russianText) {
+        currentRussianText = russianText;
 
-    // Translate to English
-    const translation = await translateText(text);
-    englishOutput.textContent = translation;
+        // Display Cyrillic
+        cyrillicOutput.textContent = russianText;
 
-    // Enable listen button
-    listenBtn.disabled = false;
+        // Generate and display transliteration
+        transliterationOutput.textContent = transliterate(russianText);
 
-    // Re-enable translate button
+        // Generate and display phonetic
+        phoneticOutput.textContent = toPhonetic(russianText);
+
+        // Enable listen button
+        listenBtn.disabled = false;
+
+        // Add to history
+        addToHistory(text);
+    } else {
+        cyrillicOutput.textContent = 'Translation error';
+    }
+
     translateBtn.disabled = false;
     translateBtn.textContent = 'Translate';
+}
+
+// Paste text into input
+function pasteToInput(text) {
+    englishInput.value = text;
+    englishInput.focus();
 }
 
 // Event listeners
 translateBtn.addEventListener('click', handleTranslation);
 
-russianInput.addEventListener('keypress', (e) => {
+englishInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && e.ctrlKey) {
         handleTranslation();
     }
 });
 
 listenBtn.addEventListener('click', () => {
-    const text = russianInput.value.trim();
-    if (text) {
-        speakText(text);
+    if (currentRussianText) {
+        speakText(currentRussianText);
     }
 });
 
@@ -223,17 +262,33 @@ listenBtn.addEventListener('click', () => {
 exampleButtons.forEach(button => {
     button.addEventListener('click', () => {
         const exampleText = button.getAttribute('data-text');
-        russianInput.value = exampleText;
+        englishInput.value = exampleText;
         handleTranslation();
     });
 });
 
-// Voice selection change
-document.querySelectorAll('input[name="voice"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-        currentVoice = e.target.value;
-    });
+// History list click handler
+historyList.addEventListener('click', (e) => {
+    if (e.target.tagName === 'LI') {
+        const text = e.target.getAttribute('data-text');
+        pasteToInput(text);
+    }
+});
+
+// Show more/less button
+showMoreBtn.addEventListener('click', () => {
+    showAllHistory = !showAllHistory;
+    renderHistory();
+});
+
+// Expressions list click handler
+expressionsList.addEventListener('click', (e) => {
+    if (e.target.tagName === 'LI') {
+        const text = e.target.getAttribute('data-text');
+        pasteToInput(text);
+    }
 });
 
 // Initialize on page load
 initializeSpeech();
+loadHistory();
